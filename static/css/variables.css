@@ -1,0 +1,72 @@
+/*
+  Design tokens for MiniCDN.
+
+  Color system is functional, not decorative: each accent maps to one
+  CDN state and is used nowhere else, so color alone tells you what
+  happened to a request.
+
+    --accent-flow  in-transit request / primary actions
+    --accent-hit   cache hit / success
+    --accent-miss  cache miss / fetching from origin
+    --accent-fail  network failure / stale
+*/
+
+:root {
+  /* ---- type ---- */
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+
+  /* ---- surfaces ---- */
+  --bg-void: #08090d;
+  --bg-void-alt: #0b0d13;
+  --bg-surface: #10131a;
+  --bg-elevated: rgba(255, 255, 255, 0.035);
+  --bg-elevated-hover: rgba(255, 255, 255, 0.055);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* ---- text ---- */
+  --text-primary: #f2f3f6;
+  --text-secondary: #949bac;
+  --text-tertiary: #5b6172;
+
+  /* ---- accents ---- */
+  --accent-flow: #5e8fff;
+  --accent-flow-soft: rgba(94, 143, 255, 0.14);
+  --accent-flow-line: rgba(94, 143, 255, 0.55);
+
+  --accent-hit: #34d399;
+  --accent-hit-soft: rgba(52, 211, 153, 0.14);
+
+  --accent-miss: #f5a623;
+  --accent-miss-soft: rgba(245, 166, 35, 0.14);
+
+  --accent-fail: #f0555b;
+  --accent-fail-soft: rgba(240, 85, 91, 0.14);
+
+  /* ---- geometry ---- */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --max-width: 1180px;
+  --gutter: 24px;
+
+  /* ---- elevation ---- */
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px -28px rgba(0, 0, 0, 0.7);
+
+  /* ---- motion ---- */
+  --ease-out: cubic-bezier(0.16, 0.8, 0.24, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-med: 320ms;
+  --dur-slow: 560ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-med: 0ms;
+    --dur-slow: 0ms;
+  }
+}

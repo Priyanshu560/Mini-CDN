@@ -1,0 +1,5 @@
+# Core dependency, required for the "Generate charts" feature
+matplotlib>=3.8
+
+# Optional: only required if you run the Flask API (app.py)
+Flask>=3.0

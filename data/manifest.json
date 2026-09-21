@@ -1,0 +1,13 @@
+{
+  "files": [
+    { "name": "index.html", "content_type": "text/html" },
+    { "name": "style.css", "content_type": "text/css" },
+    { "name": "script.js", "content_type": "application/javascript" },
+    { "name": "product.json", "content_type": "application/json" },
+    { "name": "api-data.json", "content_type": "application/json" },
+    { "name": "favicon.ico", "content_type": "image/x-icon", "simulated_size_bytes": 32768 },
+    { "name": "logo.png", "content_type": "image/png", "simulated_size_bytes": 524288 },
+    { "name": "banner.jpg", "content_type": "image/jpeg", "simulated_size_bytes": 3145728 },
+    { "name": "video.mp4", "content_type": "video/mp4", "simulated_size_bytes": 6291456 }
+  ]
+}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniCDN Demo Store</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Store logo" class="logo">
+        <h1>MiniCDN Demo Store</h1>
+    </header>
+    <main>
+        <img src="banner.jpg" alt="Seasonal sale banner" class="banner">
+        <p>This page is served through MiniCDN's edge network.</p>
+        <video src="video.mp4" controls width="480"></video>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

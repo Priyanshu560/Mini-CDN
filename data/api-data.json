@@ -1,0 +1,8 @@
+{
+  "products": [
+    { "id": "SKU-1042", "name": "Wireless Mechanical Keyboard", "price": 3499.00 },
+    { "id": "SKU-2071", "name": "USB-C Docking Station", "price": 2799.00 },
+    { "id": "SKU-3350", "name": "27-inch 4K Monitor", "price": 21999.00 }
+  ],
+  "generated_at": "2026-01-01T00:00:00"
+}

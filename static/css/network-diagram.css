@@ -1,0 +1,180 @@
+.diagram-card {
+  background: var(--bg-elevated);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 8px 8px 28px;
+  overflow: hidden;
+}
+
+.diagram-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 22px 4px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.diagram-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.diagram-status-dot.is-flow { background: var(--accent-flow); box-shadow: 0 0 8px var(--accent-flow); }
+.diagram-status-dot.is-hit { background: var(--accent-hit); box-shadow: 0 0 8px var(--accent-hit); }
+.diagram-status-dot.is-miss { background: var(--accent-miss); box-shadow: 0 0 8px var(--accent-miss); }
+.diagram-status-dot.is-fail { background: var(--accent-fail); box-shadow: 0 0 8px var(--accent-fail); }
+
+.diagram-scroll {
+  overflow-x: auto;
+}
+
+.network-diagram {
+  width: 100%;
+  min-width: 640px;
+  height: auto;
+  display: block;
+}
+
+/* ---- wires ---- */
+
+.wire {
+  fill: none;
+  stroke: var(--border-subtle);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke var(--dur-fast) var(--ease-out), stroke-width var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+
+.wire.is-active {
+  stroke: var(--accent-flow-line);
+  stroke-width: 2.5;
+}
+
+.wire.is-hit { stroke: var(--accent-hit); stroke-width: 2.5; }
+.wire.is-miss { stroke: var(--accent-miss); stroke-width: 2.5; }
+.wire.is-fail { stroke: var(--accent-fail); stroke-width: 2.5; }
+
+.wire.is-dim {
+  opacity: 0.35;
+}
+
+/* ---- packet ---- */
+
+.packet {
+  fill: var(--accent-flow);
+  filter: url(#glow);
+  transition: fill var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+
+.packet.is-hit { fill: var(--accent-hit); }
+.packet.is-miss { fill: var(--accent-miss); }
+.packet.is-fail { fill: var(--accent-fail); }
+
+/* ---- nodes ---- */
+
+.node rect {
+  fill: var(--bg-surface);
+  stroke: var(--border-subtle);
+  stroke-width: 1.5;
+  transition: stroke var(--dur-med) var(--ease-out), filter var(--dur-med) var(--ease-out);
+}
+
+.node-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--text-primary);
+  text-anchor: middle;
+  letter-spacing: 0.02em;
+}
+
+.node-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--text-tertiary);
+  text-anchor: middle;
+}
+
+.node--client rect { stroke: var(--border-strong); }
+.node--router rect { rx: 12px; }
+
+.node-cache-pulse {
+  fill: var(--text-tertiary);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+/* active / result states, applied via JS as classes on the .node group */
+
+.node.is-active rect {
+  stroke: var(--accent-flow);
+  filter: drop-shadow(0 0 10px rgba(94, 143, 255, 0.55));
+}
+
+.node.is-hit rect {
+  stroke: var(--accent-hit);
+  filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.55));
+}
+
+.node.is-miss rect {
+  stroke: var(--accent-miss);
+  filter: drop-shadow(0 0 10px rgba(245, 166, 35, 0.55));
+}
+
+.node.is-fail rect {
+  stroke: var(--accent-fail);
+  filter: drop-shadow(0 0 10px rgba(240, 85, 91, 0.55));
+}
+
+.node.is-checking .node-cache-pulse {
+  opacity: 1;
+  animation: cache-pulse 900ms var(--ease-in-out) infinite;
+}
+
+@keyframes cache-pulse {
+  0%, 100% { opacity: 0.25; r: 3; }
+  50% { opacity: 1; r: 4.5; }
+}
+
+/* ---- legend ---- */
+
+.diagram-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 14px 22px 4px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.diagram-legend li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot--flow { background: var(--accent-flow); }
+.legend-dot--hit { background: var(--accent-hit); }
+.legend-dot--miss { background: var(--accent-miss); }
+.legend-dot--fail { background: var(--accent-fail); }
+
+@media (max-width: 720px) {
+  .network-diagram {
+    min-width: 560px;
+  }
+}

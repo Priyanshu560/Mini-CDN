@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniCDN — Edge Delivery Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 28 28" width="28" height="28">
+          <circle cx="14" cy="14" r="3.2" fill="var(--accent)"/>
+          <circle cx="14" cy="14" r="9" fill="none" stroke="var(--accent)" stroke-opacity="0.45" stroke-width="1.6"/>
+          <circle cx="14" cy="14" r="13" fill="none" stroke="var(--accent)" stroke-opacity="0.2" stroke-width="1.4"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <span class="brand-name">MiniCDN</span>
+        <span class="brand-sub">Edge delivery monitor</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-status" id="api-status" title="API connection state">
+        <span class="status-dot" id="api-status-dot"></span>
+        <span id="api-status-text">Checking API&hellip;</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="connection-banner" id="connection-banner" hidden>
+    Can't reach the MiniCDN API. Start the backend with <code>python app.py</code>, then this page will pick it up automatically.
+  </div>
+
+  <section class="kpi-strip" aria-label="Key metrics">
+    <div class="kpi-card">
+      <span class="kpi-label">Total requests</span>
+      <span class="kpi-value" id="kpi-total">—</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Hit ratio</span>
+      <span class="kpi-value" id="kpi-hit-ratio">—</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Avg latency</span>
+      <span class="kpi-value" id="kpi-avg-latency">—</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Failed requests</span>
+      <span class="kpi-value" id="kpi-failed">—</span>
+    </div>
+  </section>
+
+  <section class="hero-panel" aria-label="Request routing">
+    <div class="hero-header">
+      <div>
+        <h1>Routing path</h1>
+        <p id="hero-caption">Send a request below to see how MiniCDN routes and serves it.</p>
+      </div>
+      <div class="hero-result" id="hero-result" hidden>
+        <span class="result-chip" id="result-edge">—</span>
+        <span class="result-chip" id="result-cache">—</span>
+        <span class="result-chip" id="result-latency">—</span>
+      </div>
+    </div>
+
+    <div class="hero-diagram-wrap">
+      <svg id="routing-diagram" viewBox="0 0 900 260" role="img" aria-label="Diagram showing the client, router, three edge servers, and the origin server">
+        <!-- static links -->
+        <g class="links">
+          <path id="link-client-router" class="link" d="M96,130 H208"></path>
+          <path id="link-router-delhi" class="link" d="M256,120 C 340,80 400,55 468,50"></path>
+          <path id="link-router-mumbai" class="link" d="M256,130 H468"></path>
+          <path id="link-router-bangalore" class="link" d="M256,140 C 340,180 400,205 468,210"></path>
+          <path id="link-delhi-origin" class="link link-origin" d="M512,50 C 600,50 660,90 724,122"></path>
+          <path id="link-mumbai-origin" class="link link-origin" d="M512,130 H724"></path>
+          <path id="link-bangalore-origin" class="link link-origin" d="M512,210 C 600,210 660,170 724,138"></path>
+        </g>
+
+        <!-- request pulse (animated via JS) -->
+        <circle id="request-pulse" class="pulse" cx="60" cy="130" r="5" opacity="0"></circle>
+
+        <!-- client -->
+        <g class="node node-client" transform="translate(60,130)">
+          <circle r="22" class="node-body"></circle>
+          <path d="M-8,5 a8,8 0 1,1 16,0 z M-11,10 a11,7 0 0,1 22,0" class="node-glyph" fill="none" stroke-linecap="round"></path>
+          <text y="42" class="node-label">Client</text>
+        </g>
+
+        <!-- router -->
+        <g class="node node-router" transform="translate(232,130)">
+          <rect x="-22" y="-22" width="44" height="44" rx="10" class="node-body"></rect>
+          <path d="M-10,0 H10 M0,-10 V10 M-7,-7 L7,7 M-7,7 L7,-7" class="node-glyph" stroke-linecap="round"></path>
+          <text y="42" class="node-label">Router</text>
+        </g>
+
+        <!-- edges -->
+        <g class="node node-edge" id="edge-node-delhi" transform="translate(490,50)">
+          <rect x="-26" y="-19" width="52" height="38" rx="9" class="node-body edge-body"></rect>
+          <circle class="edge-halo" r="30"></circle>
+          <text y="-28" class="node-label node-label-top">Delhi</text>
+        </g>
+        <g class="node node-edge" id="edge-node-mumbai" transform="translate(490,130)">
+          <rect x="-26" y="-19" width="52" height="38" rx="9" class="node-body edge-body"></rect>
+          <circle class="edge-halo" r="30"></circle>
+          <text y="-28" class="node-label node-label-top">Mumbai</text>
+        </g>
+        <g class="node node-edge" id="edge-node-bangalore" transform="translate(490,210)">
+          <rect x="-26" y="-19" width="52" height="38" rx="9" class="node-body edge-body"></rect>
+          <circle class="edge-halo" r="30"></circle>
+          <text y="45" class="node-label">Bangalore</text>
+        </g>
+
+        <!-- origin -->
+        <g class="node node-origin" transform="translate(760,130)">
+          <rect x="-24" y="-26" width="48" height="52" rx="8" class="node-body"></rect>
+          <path d="M-14,-14 H14 M-14,-2 H14 M-14,10 H14" class="node-glyph" stroke-linecap="round"></path>
+          <text y="45" class="node-label">Origin</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="grid-two">
+    <div class="panel" id="simulate-panel">
+      <h2>Simulate a request</h2>
+      <form id="simulate-form">
+        <label for="input-client-name">Client name</label>
+        <input type="text" id="input-client-name" name="client_name" placeholder="Anonymous" autocomplete="off">
+
+        <label for="input-location">Client location</label>
+        <select id="input-location" name="location" required></select>
+
+        <label for="input-file">Requested file</label>
+        <select id="input-file" name="file_name" required></select>
+
+        <button type="submit" id="simulate-submit">Send request</button>
+      </form>
+      <p class="form-feedback" id="simulate-feedback" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="panel" id="edge-panel">
+      <div class="panel-header-row">
+        <h2>Edge network</h2>
+        <select id="distance-location-select" aria-label="Inspect distances from a client location"></select>
+      </div>
+      <p class="panel-hint">Status reflects each edge's current share of traffic; distance is from the location selected above.</p>
+      <div class="edge-cards" id="edge-cards"></div>
+    </div>
+  </section>
+
+  <section class="panel analytics-panel" aria-label="Analytics">
+    <div class="panel-header-row">
+      <h2>Analytics</h2>
+      <button id="refresh-analytics" type="button">Refresh</button>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="analytics-block gauge-block">
+        <div class="gauge">
+          <svg viewBox="0 0 120 120">
+            <circle class="gauge-track" cx="60" cy="60" r="52"></circle>
+            <circle class="gauge-value" id="gauge-circle" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="gauge-center">
+            <span id="gauge-percent">—</span>
+            <span class="gauge-label">hit ratio</span>
+          </div>
+        </div>
+        <div class="gauge-legend">
+          <span><i class="dot dot-hit"></i>Hits <b id="analytics-hits">—</b></span>
+          <span><i class="dot dot-miss"></i>Misses <b id="analytics-misses">—</b></span>
+        </div>
+      </div>
+
+      <div class="analytics-block">
+        <h3>Requests per edge</h3>
+        <div id="server-load-bars" class="load-bars"></div>
+      </div>
+
+      <div class="analytics-block">
+        <h3>Latency</h3>
+        <dl class="stat-list">
+          <div><dt>Average</dt><dd id="stat-avg-latency">—</dd></div>
+          <div><dt>Median</dt><dd id="stat-median-latency">—</dd></div>
+          <div><dt>Fastest</dt><dd id="stat-fastest-latency">—</dd></div>
+          <div><dt>Slowest</dt><dd id="stat-slowest-latency">—</dd></div>
+        </dl>
+      </div>
+
+      <div class="analytics-block">
+        <h3>Most requested file</h3>
+        <p class="most-requested" id="most-requested-file">No requests yet</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-note">
+    <p>MiniCDN simulation dashboard &middot; talks to the local Flask API at <code id="api-base-display"></code></p>
+  </footer>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
