@@ -9,7 +9,6 @@ def _record(server_name, cache_status, latency_ms, status="SUCCESS", file_name="
     return Request(
         request_id=1,
         timestamp=datetime.now(),
-        client_name="Test Client",
         location="Delhi",
         file_name=file_name,
         server_name=server_name,

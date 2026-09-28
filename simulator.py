@@ -49,7 +49,6 @@ class Simulator:
         record = Request(
             request_id=request_id,
             timestamp=timestamp,
-            client_name=client.name,
             location=client.location,
             file_name=file_name,
             server_name=server_name,
@@ -78,10 +77,7 @@ class Simulator:
 
         for sequence in range(num_requests):
             simulated_clock += random.uniform(0.01, 0.4)
-            client = Client(
-                name=random.choice(config.SAMPLE_CLIENT_NAMES),
-                location=random.choice(list(config.CLIENT_CITIES.keys())),
-            )
+            client = Client(location=random.choice(list(config.CLIENT_CITIES.keys())))
             file_name = random.choice(self.origin.list_files())
             # `sequence` breaks ties between equal clock values so heapq
             # never needs to compare two Client objects directly.

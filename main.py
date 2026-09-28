@@ -42,11 +42,10 @@ def build_system():
 
 
 def prompt_single_request(simulator):
-    client_name = input("Client name: ").strip() or "Anonymous"
     location = input(f"Client location {list(config.CLIENT_CITIES.keys())}: ").strip()
     file_name = input("Requested file: ").strip()
 
-    client = Client(name=client_name, location=location)
+    client = Client(location=location)
     record = simulator.process_request(client, file_name)
 
     print(f"\nServer selected : {record.server_name}")

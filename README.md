@@ -1,26 +1,20 @@
 # MiniCDN
 
-A from-scratch simulation of how a content delivery network routes,
-caches, and serves files across geographically distributed edge
-servers. The routing decision, the LRU cache, the latency model, and
-the invalidation logic are all implemented directly rather than
-pulled from a library, since the point is to demonstrate the
-mechanics, not just call something that already does this.
+A simulation of how a CDN routes, caches, and serves files across
+geographically distributed edge servers. Routing, the LRU cache, the
+latency model, and cache invalidation are written directly rather than
+taken from a library.
 
 ## Overview
 
 MiniCDN models a single origin server backed by three edge servers
-(Delhi, Mumbai, Bangalore). A client submits a name, a location, and
+(Delhi, Mumbai, Bangalore). A client submits a location and
 a file name; the router picks whichever edge is geographically
 closest using the haversine formula; that edge checks its own LRU
 cache and either serves the file directly or pulls a fresh copy from
 the origin. Every request is timed, logged, and folded into running
 analytics, and the whole thing can be driven either from a CLI or a
 small Flask API.
-
-The project is split into narrow, single-purpose modules so caching,
-routing, latency, and analytics can each be read, tested, and
-explained on their own.
 
 ## Architecture
 
@@ -56,7 +50,7 @@ explained on their own.
 
 Request flow, in order:
 
-1. A client (name + location) asks for a file.
+1. A client (a location) asks for a file.
 2. `Router` resolves the client's city to coordinates and picks the edge server with the smallest haversine distance to it.
 3. That `EdgeServer` checks its own `LRUCache` for the file: cached and version matches the origin is a **HIT**; cached but the origin has moved on to a newer version is **STALE**; not cached at all is a **MISS**.
 4. On a miss or a stale hit, the edge fetches a fresh copy from the origin, caches it (evicting the least-recently-used entry if it needs the room), and serves it.
@@ -73,14 +67,36 @@ Request flow, in order:
 - A latency model combining base network latency, size-based transfer time, and random jitter, plus a small simulated failure rate per server
 - An event-driven batch simulator that schedules requests on a `heapq` priority queue and processes them in simulated arrival order
 - Full request analytics: hit/miss ratio, average/median/fastest/slowest latency, per-server load, and the most requested file
-- Structured, greppable logging to `logs/server.log`
+- Structured, greppable logging to `logs/server.log` (size-rotated; no client identifiers)
 - Matplotlib charts for cache hits vs. misses, latency distribution, requests per server, and per-edge cache utilization
 - An optional Flask JSON API that drives the same simulation as the CLI
-- 35 unit and integration tests across 7 test modules
+- 52 unit and integration tests across 10 test modules
 
-## Screenshots
+## Example output
 
-_Run a batch simulation (`python main.py 500`), then drop a screenshot of the CLI output and a couple of the generated charts from `docs/charts/` here._
+`python main.py 500` prints a summary like this (numbers vary per run, since arrivals, jitter and failures are random) and writes charts to `docs/charts/`:
+
+```
+MiniCDN Analytics Summary
+========================================
+Total requests:       500
+Cache hits:           277
+Cache misses:         216
+Failed requests:      7
+Hit ratio:            56.19%
+Miss ratio:           43.81%
+Average latency:      149.0 ms
+Median latency:       121.57 ms
+Fastest request:      17.04 ms
+Slowest request:      458.79 ms
+
+Most requested file:  banner.jpg (69 requests)
+
+Requests per server:
+  Bangalore    106
+  Mumbai       104
+  Delhi        283
+```
 
 ## Installation
 
@@ -107,7 +123,6 @@ Example interactive session:
 
 ```
 Choose an option: 1
-Client name: Ravi
 Client location ['Delhi', 'Mumbai', 'Bangalore', 'Punjab', 'Jaipur', 'Lucknow', 'Kolkata', 'Hyderabad', 'Ahmedabad']: Punjab
 Requested file: video.mp4
 
@@ -141,7 +156,7 @@ python app.py
 ```
 curl -X POST http://127.0.0.1:5000/request \
   -H "Content-Type: application/json" \
-  -d '{"client_name": "Ravi", "location": "Punjab", "file_name": "video.mp4"}'
+  -d '{"location": "Punjab", "file_name": "video.mp4"}'
 ```
 
 ## Project Structure
@@ -171,6 +186,8 @@ mini-cdn/
 │   ├── index.html
 │   ├── style.css
 │   ├── script.js
+│   ├── privacy.html
+│   ├── terms.html
 │   ├── product.json
 │   └── api-data.json
 ├── docs/
@@ -183,27 +200,13 @@ mini-cdn/
     ├── test_origin_server.py
     ├── test_edge_server.py
     ├── test_analytics.py
-    └── test_simulator.py
+    ├── test_simulator.py
+    ├── test_static_pages.py
+    ├── test_logger.py
+    └── test_app.py
 ```
 
 `logs/` and `docs/charts/` aren't part of the checkout -- both are created automatically the first time you run a simulation or generate charts, and both are gitignored.
-
-## Suggested Commit Sequence
-
-If you're pushing this to your own repository under your own name, this is roughly the order it was actually built in:
-
-1. Initial project scaffolding: config, models, `.gitignore`, requirements
-2. Add network latency simulation
-3. Implement LRU cache from scratch, with tests
-4. Add distance-based routing between edge servers, with tests
-5. Add origin server with file catalog and versioning, with tests
-6. Add edge server request handling with cache validation, with tests
-7. Add request analytics and structured logging, with tests
-8. Add batch simulator with event-driven request processing, with tests
-9. Add matplotlib visualizations
-10. Add CLI entry point
-11. Add optional Flask API
-12. Add README and architecture docs
 
 ## Future Improvements
 
@@ -214,14 +217,6 @@ If you're pushing this to your own repository under your own name, this is rough
 - Persist analytics between runs instead of resetting them every time the process starts.
 - Add authentication and rate limiting to the Flask API before it's anything more than a local demo.
 
-## Learning Outcomes
+## Notes on logging
 
-Building this touches a reasonable cross-section of what tends to come up in a systems design interview:
-
-- Geographic routing and the haversine formula
-- LRU eviction, and why `OrderedDict` gets you O(1) get/put for free
-- Cache coherency -- version-based invalidation vs. TTL, and why this project uses lazy, pull-based invalidation instead of a push/purge API
-- Discrete-event simulation with a heap-based priority queue
-- Latency modeling: base latency vs. transfer time vs. jitter, and how they compose across two hops on a cache miss
-- Structured logging and statistical analysis of system behavior
-- Separation of concerns across modules, and custom exceptions scoped to the component that raises them
+Each request appends a line to `logs/server.log` with the client's city, the file, the edge chosen, and the outcome. No client name or other identifier is collected. The log rotates at about 1 MB (3 backups); delete `logs/` to clear it. The project makes no network calls beyond the optional local Flask API. The demo page's [privacy policy](data/privacy.html) and [terms](data/terms.html) describe this in more detail.

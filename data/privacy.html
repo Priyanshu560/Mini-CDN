@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Privacy Policy - MiniCDN Demo Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Privacy Policy</h1>
+    </header>
+    <main>
+        <p>Last updated: 29 September 2026</p>
+        <p>
+            MiniCDN is a local simulator of a content delivery network. This page describes
+            what the code in this repository actually does with data. It is a plain description,
+            not legal advice, and it does not claim that the project meets the requirements of
+            any particular law.
+        </p>
+
+        <h2>Who is responsible</h2>
+        <p>
+            No company or registered business is named for this project. For questions about
+            this policy or the data it describes, contact the project owner at
+            <a href="mailto:priyanshu23456singh@gmail.com">priyanshu23456singh@gmail.com</a>.
+        </p>
+
+        <h2>What the project handles</h2>
+        <p>
+            MiniCDN does not have accounts, sign-in, forms, or payments, and it does not ask for
+            names, email addresses, phone numbers, or ID numbers. The only inputs are:
+        </p>
+        <ul>
+            <li>
+                <strong>A city name</strong> (from a fixed list) and <strong>a file name</strong>, sent
+                through the command-line menu or the <code>POST /request</code> API. They are used to
+                choose the nearest edge server and to look up the file in the simulated cache.
+            </li>
+            <li>
+                <strong>Simulation results</strong> (edge server, cache hit or miss, simulated latency,
+                status), used for the analytics report and charts.
+            </li>
+        </ul>
+        <p>
+            Earlier versions of the API accepted an optional <code>client_name</code>. It served no
+            purpose and has been removed. If a caller still sends it, it is ignored and not stored.
+        </p>
+
+        <h2>Where data goes and how long it stays</h2>
+        <ul>
+            <li>Analytics are held in memory and disappear when the program stops.</li>
+            <li>
+                Each request adds one line to <code>logs/server.log</code> on the machine running the
+                program: timestamp, city, file name, edge server, cache status, latency, and status.
+                The log rotates at about 1 MB and keeps three older files, so the oldest entries are
+                dropped automatically. There is no time-based deletion. Delete the <code>logs/</code>
+                folder to remove it all.
+            </li>
+            <li>
+                Charts in <code>docs/charts/</code> contain only aggregate totals.
+            </li>
+            <li>
+                When the optional Flask API runs, its development server prints each request's source IP
+                address, time, and URL path to the terminal. The project does not save this output.
+            </li>
+        </ul>
+
+        <h2>Sharing with third parties</h2>
+        <p>
+            The project sends nothing to any third party. It loads no external scripts, fonts,
+            images, videos, or maps, and includes no analytics or advertising tools.
+        </p>
+
+        <h2>Cookies and similar technologies</h2>
+        <p>
+            The project sets no cookies and does not use <code>localStorage</code> or
+            <code>sessionStorage</code>. Because nothing non-essential is used, there is no cookie
+            banner.
+        </p>
+
+        <h2>Children</h2>
+        <p>
+            The project does not ask for anyone's age and is not designed to collect personal data
+            from children.
+        </p>
+
+        <h2>If you run this for other people</h2>
+        <p>
+            The API has no authentication and is meant for local use only. Anyone who deploys it
+            publicly becomes responsible for deciding which privacy rules apply, updating this page,
+            and setting their own retention period and contact details.
+        </p>
+
+        <p><a href="index.html">Back to the demo store</a> | <a href="terms.html">Terms &amp; Conditions</a></p>
+    </main>
+</body>
+</html>

@@ -29,7 +29,6 @@ class FileObject:
 
 @dataclass
 class Client:
-    name: str
     location: str
 
 
@@ -46,7 +45,6 @@ class Request:
     """A fully resolved request, ready to be logged and analyzed."""
     request_id: int
     timestamp: datetime
-    client_name: str
     location: str
     file_name: str
     server_name: str

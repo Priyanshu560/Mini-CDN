@@ -66,11 +66,6 @@ CLIENT_CITIES = {
     "Ahmedabad": Coordinates(23.0225, 72.5714),
 }
 
-SAMPLE_CLIENT_NAMES = [
-    "Aarav", "Priya", "Rohan", "Ananya", "Vikram",
-    "Neha", "Karan", "Simran", "Arjun", "Divya",
-]
-
 # --- Network simulation ---
 NETWORK_JITTER_MS = 8
 NETWORK_FAILURE_PROBABILITY = 0.02
@@ -79,3 +74,14 @@ NETWORK_FAILURE_PROBABILITY = 0.02
 # on it while a batch simulation is running, so cache invalidation
 # actually gets exercised instead of only being covered by unit tests.
 ORIGIN_UPDATE_PROBABILITY = 0.01
+
+# --- Logging ---
+LOG_MAX_BYTES = 1_000_000  # rotate at ~1 MB, keep LOG_BACKUP_COUNT old files
+LOG_BACKUP_COUNT = 3
+
+# --- Flask API ---
+# Loopback only: the API has no authentication.
+API_HOST = "127.0.0.1"
+API_PORT = 5000
+API_MAX_BODY_BYTES = 4096
+API_MAX_FIELD_LENGTH = 64
